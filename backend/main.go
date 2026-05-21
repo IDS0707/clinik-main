@@ -19,6 +19,9 @@ func main() {
 	database.SeedAdmin(cfg)
 
 	r := gin.Default()
+	if err := r.SetTrustedProxies([]string{"127.0.0.1"}); err != nil {
+		log.Fatal("Failed to set trusted proxies:", err)
+	}
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:  []string{"*"},

@@ -33,6 +33,7 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
       PORT: "8080"
+      GIN_MODE: "release"
     depends_on:
       db:
         condition: service_healthy
