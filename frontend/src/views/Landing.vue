@@ -69,7 +69,7 @@
     </section>
 
     <!-- Trust bar -->
-    <section class="bg-brand-50/70 py-5 border-y border-brand-100/60 backdrop-blur-sm">
+    <section class="bg-brand-50 py-5 border-y border-brand-100/60">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-brand-700">
           <div class="flex items-center gap-2 hover:text-brand-800 transition-colors duration-300 cursor-default">

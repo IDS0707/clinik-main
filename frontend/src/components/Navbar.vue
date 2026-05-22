@@ -1,6 +1,6 @@
 <template>
   <nav class="fixed inset-x-0 top-0 z-50 transition-all duration-500"
-       :class="scrolled ? 'bg-white/95 backdrop-blur-2xl shadow-lg shadow-stone-900/[0.04] border-b border-stone-200/50' : 'bg-white/80 backdrop-blur-xl'">
+       :class="scrolled ? 'bg-white shadow-lg shadow-stone-900/[0.04] border-b border-stone-200/50' : 'bg-white/95'">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-[72px]">
         <!-- Logo -->
@@ -192,7 +192,7 @@
     <!-- Mobile menu dropdown -->
     <div
       v-if="mobileMenuOpen"
-      class="md:hidden border-t border-stone-200/50 bg-white/98 backdrop-blur-2xl px-4 py-4 flex flex-col gap-1"
+      class="md:hidden border-t border-stone-200/50 bg-white px-4 py-4 flex flex-col gap-1"
     >
       <a href="/#doctor" @click="mobileMenuOpen = false"
          class="text-sm font-medium text-stone-600 hover:text-brand-700 px-4 py-3 rounded-xl hover:bg-brand-50/60 transition-all duration-200">
