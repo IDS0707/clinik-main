@@ -177,9 +177,20 @@
                   <span class="text-xs text-purple-700">Рекомендовал: {{ order.referred_by }}</span>
                 </div>
               </div>
-              <span :class="statusClass(order.status)" class="text-xs font-semibold px-3 py-1.5 rounded-full">
-                {{ statusLabel(order.status) }}
-              </span>
+              <div class="flex items-center gap-2">
+                <span :class="statusClass(order.status)" class="text-xs font-semibold px-3 py-1.5 rounded-full">
+                  {{ statusLabel(order.status) }}
+                </span>
+                <button
+                  @click="deleteOrder(order.id)"
+                  class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                  title="Удалить заказ"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <div class="border-t pt-4 space-y-2">
@@ -1753,6 +1764,16 @@ async function updateOrderStatus(id, status) {
     await loadOrders()
   } catch (e) {
     alert('Ошибка при обновлении статуса')
+  }
+}
+
+async function deleteOrder(id) {
+  if (!confirm('Удалить этот заказ? Действие нельзя отменить.')) return
+  try {
+    await api.delete(`/admin/orders/${id}`)
+    await loadOrders()
+  } catch (e) {
+    alert('Ошибка при удалении заказа')
   }
 }
 

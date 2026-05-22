@@ -200,6 +200,30 @@ func UpdateOrderStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, order)
 }
 
+func DeleteOrder(c *gin.Context) {
+	id := c.Param("id")
+	var order models.Order
+	if err := database.DB.First(&order, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Заказ не найден"})
+		return
+	}
+
+	tx := database.DB.Begin()
+	if err := tx.Where("order_id = ?", order.ID).Delete(&models.OrderItem{}).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка при удалении позиций заказа"})
+		return
+	}
+	if err := tx.Delete(&order).Error; err != nil {
+		tx.Rollback()
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка при удалении заказа"})
+		return
+	}
+	tx.Commit()
+
+	c.JSON(http.StatusOK, gin.H{"message": "Заказ удалён"})
+}
+
 func formatNumber(n float64) string {
 	s := fmt.Sprintf("%.0f", n)
 	if len(s) <= 3 {
