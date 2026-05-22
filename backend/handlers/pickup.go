@@ -156,6 +156,13 @@ func UpdatePickupOrderStatus(c *gin.Context) {
 			return
 		}
 		order.CancellationReason = reason
+		if workerID, ok := c.Get("workerID"); ok {
+			var worker models.Worker
+			if err := database.DB.First(&worker, workerID).Error; err == nil {
+				order.CancelledByName = worker.Name
+				order.CancelledByRole = worker.Role
+			}
+		}
 	}
 
 	order.Status = input.Status

@@ -193,13 +193,24 @@
               </div>
             </div>
 
-            <div v-if="order.status === 'cancelled' && order.cancellation_reason" class="mb-4 flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              <svg class="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div class="text-sm">
-                <span class="font-semibold text-red-700">Причина отмены:</span>
-                <span class="text-red-600 ml-1">{{ order.cancellation_reason }}</span>
+            <div v-if="order.status === 'cancelled' && (order.cancellation_reason || order.cancelled_by_name)" class="mb-4 bg-red-50 border border-red-200 rounded-lg px-3 py-2 space-y-1">
+              <div v-if="order.cancellation_reason" class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="text-sm">
+                  <span class="font-semibold text-red-700">Причина отмены:</span>
+                  <span class="text-red-600 ml-1">{{ order.cancellation_reason }}</span>
+                </div>
+              </div>
+              <div v-if="order.cancelled_by_name" class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <div class="text-sm">
+                  <span class="font-semibold text-red-700">Отменил:</span>
+                  <span class="text-red-600 ml-1">{{ order.cancelled_by_name }}<span v-if="order.cancelled_by_role" class="text-red-400"> ({{ order.cancelled_by_role === 'nurse' ? 'медсестра' : 'пункт выдачи' }})</span></span>
+                </div>
               </div>
             </div>
 

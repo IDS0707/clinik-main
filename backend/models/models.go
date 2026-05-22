@@ -125,6 +125,8 @@ type Order struct {
 	PatientFName    string      `json:"patient_first_name"`
 	PatientLName    string      `json:"patient_last_name"`
 	CancellationReason string   `json:"cancellation_reason"`
+	CancelledByName    string   `json:"cancelled_by_name"`
+	CancelledByRole    string   `json:"cancelled_by_role"`
 	CreatedAt       time.Time   `json:"created_at"`
 }
 
