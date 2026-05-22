@@ -4,6 +4,7 @@ import (
 	"clinic-backend/database"
 	"clinic-backend/models"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -127,7 +128,8 @@ func UpdatePickupOrderStatus(c *gin.Context) {
 	}
 
 	var input struct {
-		Status string `json:"status" binding:"required"`
+		Status             string `json:"status" binding:"required"`
+		CancellationReason string `json:"cancellation_reason"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный статус"})
@@ -145,6 +147,15 @@ func UpdatePickupOrderStatus(c *gin.Context) {
 	if !validStatuses[input.Status] {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный статус"})
 		return
+	}
+
+	if input.Status == "cancelled" {
+		reason := strings.TrimSpace(input.CancellationReason)
+		if reason == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Укажите причину отмены"})
+			return
+		}
+		order.CancellationReason = reason
 	}
 
 	order.Status = input.Status

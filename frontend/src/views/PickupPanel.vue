@@ -880,8 +880,19 @@ async function searchByCode() {
 }
 
 async function updateStatus(order, status) {
+  const payload = { status }
+  if (status === 'cancelled') {
+    const reason = prompt('Укажите причину отмены заказа:')
+    if (reason === null) return
+    const trimmed = reason.trim()
+    if (!trimmed) {
+      alert('Причина обязательна')
+      return
+    }
+    payload.cancellation_reason = trimmed
+  }
   try {
-    const res = await api.put(`/pickup/orders/${order.id}/status`, { status })
+    const res = await api.put(`/pickup/orders/${order.id}/status`, payload)
     const idx = orders.value.findIndex(o => o.id === order.id)
     if (idx !== -1) orders.value[idx] = res.data
     if (foundOrder.value?.id === order.id) foundOrder.value = res.data

@@ -124,6 +124,7 @@ type Order struct {
 	OfflineNote     string      `json:"offline_note"`
 	PatientFName    string      `json:"patient_first_name"`
 	PatientLName    string      `json:"patient_last_name"`
+	CancellationReason string   `json:"cancellation_reason"`
 	CreatedAt       time.Time   `json:"created_at"`
 }
 

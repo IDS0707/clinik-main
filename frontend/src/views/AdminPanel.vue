@@ -193,6 +193,16 @@
               </div>
             </div>
 
+            <div v-if="order.status === 'cancelled' && order.cancellation_reason" class="mb-4 flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+              <svg class="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div class="text-sm">
+                <span class="font-semibold text-red-700">Причина отмены:</span>
+                <span class="text-red-600 ml-1">{{ order.cancellation_reason }}</span>
+              </div>
+            </div>
+
             <div class="border-t pt-4 space-y-2">
               <div v-for="item in order.items" :key="item.id" class="flex justify-between text-sm py-1">
                 <span class="text-gray-600">{{ item.product?.name }} <span class="text-gray-400">× {{ item.quantity }} {{ item.unit_type === 'piece' ? 'шт' : 'упак.' }}</span></span>
