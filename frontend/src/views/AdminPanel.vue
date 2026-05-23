@@ -256,26 +256,61 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-              <tr v-for="w in workers" :key="w.id" class="hover:bg-gray-50 transition">
-                <td class="px-5 py-3 font-medium text-gray-800">{{ w.name }}</td>
-                <td class="px-5 py-3 text-gray-500 font-mono">+{{ w.phone }}</td>
-                <td class="px-5 py-3">
-                  <span :class="w.role === 'nurse' ? 'bg-teal-50 text-teal-700' : 'bg-blue-50 text-blue-700'"
-                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium">
-                    {{ w.role === 'nurse' ? 'Медсестра' : 'Пункт выдачи' }}
-                  </span>
-                </td>
-                <td class="px-5 py-3 text-right">
-                  <div class="flex items-center justify-end gap-1">
-                    <button @click="openEditWorkerModal(w)" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Редактировать">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    </button>
-                    <button @click="deleteWorker(w.id)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="Удалить">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
+              <template v-for="w in workers" :key="w.id">
+                <tr class="hover:bg-gray-50 transition">
+                  <td class="px-5 py-3 font-medium text-gray-800">{{ w.name }}</td>
+                  <td class="px-5 py-3 text-gray-500 font-mono">+{{ w.phone }}</td>
+                  <td class="px-5 py-3">
+                    <span :class="w.role === 'nurse' ? 'bg-teal-50 text-teal-700' : 'bg-blue-50 text-blue-700'"
+                      class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium">
+                      {{ w.role === 'nurse' ? 'Медсестра' : 'Пункт выдачи' }}
+                    </span>
+                  </td>
+                  <td class="px-5 py-3 text-right">
+                    <div class="flex items-center justify-end gap-1">
+                      <button @click="toggleWorkerStats(w)" class="p-2 rounded-lg transition"
+                        :class="expandedWorkerId === w.id ? 'text-emerald-600 bg-emerald-50' : 'text-gray-400 hover:bg-gray-100'"
+                        title="Статистика">
+                        <svg class="w-4 h-4 transition-transform duration-200" :class="expandedWorkerId === w.id ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                      </button>
+                      <button @click="openEditWorkerModal(w)" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition" title="Редактировать">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                      </button>
+                      <button @click="deleteWorker(w.id)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="Удалить">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="expandedWorkerId === w.id" class="bg-emerald-50/40">
+                  <td colspan="4" class="px-5 py-4">
+                    <div v-if="workerStatsLoading" class="flex items-center gap-2 text-sm text-gray-400 py-2">
+                      <div class="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
+                      Загрузка статистики...
+                    </div>
+                    <div v-else-if="workerStats" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div v-for="(period, key) in { today: 'Сегодня', week: 'За 7 дней', month: 'За 30 дней' }" :key="key"
+                        class="bg-white rounded-xl border border-emerald-100 p-4">
+                        <div class="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">{{ period }}</div>
+                        <div class="space-y-1.5">
+                          <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Заказов:</span>
+                            <span class="font-bold text-gray-800">{{ workerStats[key]?.orders || 0 }}</span>
+                          </div>
+                          <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Товаров:</span>
+                            <span class="font-bold text-gray-800">{{ workerStats[key]?.items || 0 }} шт</span>
+                          </div>
+                          <div class="flex justify-between text-sm pt-1.5 border-t border-emerald-50">
+                            <span class="text-gray-500">Выручка:</span>
+                            <span class="font-bold text-emerald-700">{{ formatPrice(workerStats[key]?.revenue || 0) }} сўм</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </template>
               <tr v-if="workers.length === 0">
                 <td colspan="4" class="px-5 py-12 text-center text-gray-400">
                   <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1992,6 +2027,27 @@ async function toggleDoctorStats(doc) {
     doctorStats.value = res.data
   } catch { doctorStats.value = { doctor: doc, total_orders: 0, products: [] } }
   finally { doctorStatsLoading.value = false }
+}
+
+// ===== Worker Stats =====
+const expandedWorkerId = ref(null)
+const workerStats = ref(null)
+const workerStatsLoading = ref(false)
+
+async function toggleWorkerStats(w) {
+  if (expandedWorkerId.value === w.id) {
+    expandedWorkerId.value = null
+    workerStats.value = null
+    return
+  }
+  expandedWorkerId.value = w.id
+  workerStats.value = null
+  workerStatsLoading.value = true
+  try {
+    const res = await api.get(`/admin/workers/${w.id}/stats`)
+    workerStats.value = res.data
+  } catch { workerStats.value = { today: { orders: 0, items: 0, revenue: 0 }, week: { orders: 0, items: 0, revenue: 0 }, month: { orders: 0, items: 0, revenue: 0 } } }
+  finally { workerStatsLoading.value = false }
 }
 
 async function loadPerDoctorStats() {

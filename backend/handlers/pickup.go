@@ -165,6 +165,13 @@ func UpdatePickupOrderStatus(c *gin.Context) {
 		}
 	}
 
+	if input.Status == "delivered" {
+		if workerID, ok := c.Get("workerID"); ok {
+			wid := workerID.(uint)
+			order.WorkerID = &wid
+		}
+	}
+
 	order.Status = input.Status
 	database.DB.Save(&order)
 

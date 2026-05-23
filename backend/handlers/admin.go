@@ -5,6 +5,8 @@ import (
 	"clinic-backend/middleware"
 	"clinic-backend/models"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -276,4 +278,51 @@ func DeleteWorker(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Работник удалён"})
+}
+
+type WorkerPeriodStats struct {
+	Orders  int     `json:"orders"`
+	Revenue float64 `json:"revenue"`
+	Items   int     `json:"items"`
+}
+
+func GetWorkerStats(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+	var worker models.Worker
+	if err := database.DB.First(&worker, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Работник не найден"})
+		return
+	}
+
+	now := time.Now()
+	todayStart := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	weekStart := todayStart.AddDate(0, 0, -6)
+	monthStart := todayStart.AddDate(0, 0, -29)
+
+	calc := func(since time.Time) WorkerPeriodStats {
+		var orders []models.Order
+		database.DB.
+			Where("worker_id = ? AND status = ? AND created_at >= ?", worker.ID, "delivered", since).
+			Preload("Items").
+			Find(&orders)
+		stats := WorkerPeriodStats{Orders: len(orders)}
+		for _, o := range orders {
+			for _, it := range o.Items {
+				stats.Revenue += it.Price
+				stats.Items += it.Quantity
+			}
+		}
+		return stats
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"worker": worker,
+		"today":  calc(todayStart),
+		"week":   calc(weekStart),
+		"month":  calc(monthStart),
+	})
 }
