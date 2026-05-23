@@ -200,8 +200,12 @@
               <label class="block text-xs font-medium text-gray-500 mb-1">{{ txt.qty }}</label>
               <input v-model.number="offlineQty" type="number" min="1" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             </div>
-            <div class="flex items-end pb-0.5">
-              <span class="text-sm text-gray-600 font-medium px-2">{{ txt.pack }}</span>
+            <div class="w-28">
+              <label class="block text-xs font-medium text-gray-500 mb-1">{{ txt.unit }}</label>
+              <select v-model="offlineUnit" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="pack">{{ txt.pack }}</option>
+                <option value="piece">{{ txt.piece }}</option>
+              </select>
             </div>
             <button
               @click="addOfflineItem"
@@ -1060,10 +1064,12 @@ function addOfflineItem() {
   if (!offlineProductId.value || offlineQty.value < 1) return
   const product = allProducts.value.find(p => p.id === offlineProductId.value)
   if (!product) return
-  const price = product.price_per_pack * offlineQty.value
-  offlineItems.value.push({ product_id: product.id, name: product.name, quantity: offlineQty.value, unit_type: 'pack', price })
+  const unitPrice = offlineUnit.value === 'piece' ? product.price_per_pill : product.price_per_pack
+  const price = unitPrice * offlineQty.value
+  offlineItems.value.push({ product_id: product.id, name: product.name, quantity: offlineQty.value, unit_type: offlineUnit.value, price })
   offlineProductId.value = ''
   offlineQty.value = 1
+  offlineUnit.value = 'pack'
 }
 
 async function submitOfflineSale() {
